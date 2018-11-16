@@ -45,8 +45,8 @@ class SGenerator(object):
         ys = []
         for i in range(batch_size):
             one = self.sample_one(label_len)
-            Xs.append(one[X])
-            ys.append(one[y])
+            Xs.append(one['X'])
+            ys.append(one['y'])
 
         return {'X':np.array(Xs), 'y': np.array(ys)}
 

@@ -1,3 +1,4 @@
+import numpy as np
 class EGenerator(object):
     def __init__(self, name):
         self.name = name
@@ -15,6 +16,8 @@ class GaussEGenerator(EGenerator):
 	def generate_points(self, nums):
 		n_centers = len(nums)
 		n_samples = n_centers * max(nums)
+		if self.cluster_std is None:
+			self.cluster_std = np.random.uniform(low=0.1, high=0.5, size=(n_centers,))
 		from sklearn.datasets.samples_generator import make_blobs
 		X, y = make_blobs(n_samples=n_samples, centers=n_centers, cluster_std=self.cluster_std,
 			n_features=self.n_features, shuffle=False)
