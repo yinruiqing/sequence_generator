@@ -1,5 +1,6 @@
 # uniform
-
+import numpy as np
+from numpy.random import randint
 class NDistribution(object):
     def __init__(self, name):
         self.name = name
@@ -18,6 +19,6 @@ class UniformDistribution(NDistribution):
         self.start = start
         self.stop = stop
 
-    def sample(self):
-        from random import randint
+    def sample(self, random_seed=None):
+        np.random.seed(random_seed)
         return randint(self.start, self.stop)

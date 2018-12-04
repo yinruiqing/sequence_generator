@@ -1,13 +1,15 @@
 import numpy as np
-
+from numpy.random import randint
 class SGenerator(object):
-    def __init__(self, duration, ndistribution, wdistribution, ddistribution, odistribution, egenerator):
+    def __init__(self, duration, ndistribution, wdistribution, ddistribution, odistribution, egenerator, random_seed=42):
         self.duration = duration
         self.ndistribution = ndistribution
         self.wdistribution = wdistribution
         self.ddistribution = ddistribution
         self.odistribution = odistribution
         self.egenerator = egenerator
+
+        np.random.seed(random_seed)
 
     def re_order(self, seq):
         seen = set()
@@ -19,10 +21,11 @@ class SGenerator(object):
         return res
 
     def sample_one(self, label_len, reorder=True):
-        num = self.ndistribution.sample()
-        weights = self.wdistribution.sample(num)
-        orders = self.odistribution.sample(label_len, weights)
-        durations = self.ddistribution.sample(label_len)
+        random_seed = randint(0,1000)
+        num = self.ndistribution.sample(random_seed=random_seed)
+        weights = self.wdistribution.sample(num, random_seed=random_seed)
+        orders = self.odistribution.sample(label_len, weights, random_seed=random_seed)
+        durations = self.ddistribution.sample(label_len, random_seed=random_seed)
 
         labels = [[label] * dur for label, dur in zip(orders, durations)]
         labels = [label for sublist in labels for label in sublist]
@@ -31,11 +34,11 @@ class SGenerator(object):
         if reorder:
             labels = self.re_order(labels)
 
-        counter = [sum(labels==i) for i in range(num)]
-        embedding_cands = self.egenerator.generate_points(counter)
+        counter = [sum(labels==i) for i in range(1, num+1)]
+        embedding_cands = self.egenerator.generate_points(counter, random_seed=random_seed)
         embeddings = np.zeros((len(labels), self.egenerator.n_features))
         for i, cand in enumerate(embedding_cands):
-            embeddings[labels==i] = cand
+            embeddings[labels==(i+1)] = cand
 
         return {'X':embeddings[:self.duration], 'y': labels[:self.duration]}
 

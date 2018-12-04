@@ -1,17 +1,22 @@
 from pyannote.pipeline import Pipeline
 from pyannote.metrics.diarization import GreedyDiarizationErrorRate
 from pyannote.pipeline.blocks.clustering import AffinityPropagationClustering
+from pyannote.pipeline.blocks.clustering import HierarchicalAgglomerativeClustering
+
 from pyannote.core import Segment, Annotation
 import chocolate
 from pyannote.pipeline import Optimizer
 
 class ClusterPipeline(Pipeline):
-    def __init__(self, name='ap'):
+    def __init__(self, name='ap', **params):
         super().__init__()
-        if name not in ['ap']:
+        if name not in ['ap', 'hac']:
             raise NotImplementedError
         if name == 'ap':
             self.clustering = AffinityPropagationClustering('euclidean')
+        if name == 'hac':
+            print(params)
+            self.clustering = HierarchicalAgglomerativeClustering(**params)
 
 
     def __call__(self, item):
@@ -36,15 +41,15 @@ class ClusterPipeline(Pipeline):
 
 
 class ClusterOptimizer(object):
-    def __init__(self, name, num_iter=100):
+    def __init__(self, name, db_path, num_iter=100, **params):
         self.name = name
         self.num_iter = num_iter
-        self.pipeline = ClusterPipeline(name)
-        self.optimizer = Optimizer(self.pipeline, '/tmp/toto.db')
+        self.pipeline = ClusterPipeline(name, **params)
+        self.optimizer = Optimizer(self.pipeline, db_path)
 
 
     def fit(self, data):
         result = self.optimizer.tune(data, n_iterations=self.num_iter)
 
     def predict(self, Xys):
-        return [self.pipeline(Xy) for Xy in Xys]
+        return [self.optimizer.best_pipeline(Xy) for Xy in Xys]

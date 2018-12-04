@@ -1,5 +1,5 @@
 # poisson
-
+import numpy as np
 class DDistribution(object):
     def __init__(self, name):
         self.name = name
@@ -17,6 +17,6 @@ class PoissonDistribution(DDistribution):
         super(PoissonDistribution, self).__init__(self._NAME)
         self.lam = lam
 
-    def sample(self, n=100):
-        import numpy as np
+    def sample(self, n=100, random_seed=None):
+        np.random.seed(random_seed)
         return np.random.poisson(self.lam, n)
