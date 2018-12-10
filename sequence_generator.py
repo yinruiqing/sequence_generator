@@ -20,7 +20,22 @@ class SGenerator(object):
             res[seq==label] = i+1
         return res
 
-    def sample_one(self, label_len, reorder=True):
+    def change_order(self, seq):
+        label_ordered = self.re_order(seq)
+        tmp = np.zeros(len(seq)-1,dtype=int)
+        res = np.zeros(len(seq),dtype=int)
+        
+        label_orign = label_ordered[:-1]
+        label_shift = label_ordered[1:]
+        tmp[label_shift == label_orign] = 0
+        tmp[label_shift < label_orign] = 1
+        tmp[label_shift > label_orign] = 2
+        res[0] = 2
+        res[1:]=tmp
+        
+        return res
+
+    def sample_one(self, label_len, reorder=True, change_label=False):
         random_seed = randint(0,1000)
         num = self.ndistribution.sample(random_seed=random_seed)
         weights = self.wdistribution.sample(num, random_seed=random_seed)
@@ -40,22 +55,24 @@ class SGenerator(object):
         for i, cand in enumerate(embedding_cands):
             embeddings[labels==(i+1)] = cand
 
+        if change_label:
+            labels = self.change_order(labels)
         return {'X':embeddings[:self.duration], 'y': labels[:self.duration]}
 
 
-    def sample_batch(self, label_len, batch_size):
+    def sample_batch(self, label_len, batch_size, change_label=False):
         Xs = []
         ys = []
         for i in range(batch_size):
-            one = self.sample_one(label_len)
+            one = self.sample_one(label_len, change_label=change_label)
             Xs.append(one['X'])
             ys.append(one['y'])
 
         return {'X':np.array(Xs), 'y': np.array(ys)}
 
-    def generator(self, label_len, batch_size):
+    def generator(self, label_len, batch_size, change_label=False):
         while True:
-            yield self.sample_batch(label_len, batch_size)
+            yield self.sample_batch(label_len, batch_size, change_label)
 
 
 
