@@ -2,6 +2,7 @@ from pyannote.pipeline import Pipeline
 from pyannote.metrics.diarization import GreedyDiarizationErrorRate
 from pyannote.pipeline.blocks.clustering import AffinityPropagationClustering
 from pyannote.pipeline.blocks.clustering import HierarchicalAgglomerativeClustering
+from pipelines.clustering import ChineseWhispersClustering
 
 from pyannote.core import Segment, Annotation
 import chocolate
@@ -10,13 +11,16 @@ from pyannote.pipeline import Optimizer
 class ClusterPipeline(Pipeline):
     def __init__(self, name='ap', **params):
         super().__init__()
-        if name not in ['ap', 'hac']:
+        if name not in ['ap', 'hac', 'chinese_whisper']:
             raise NotImplementedError
         if name == 'ap':
             self.clustering = AffinityPropagationClustering('euclidean')
         if name == 'hac':
             print(params)
             self.clustering = HierarchicalAgglomerativeClustering(**params)
+        if name == 'chinese_whisper':
+            self.clustering = ChineseWhispersClustering(**params)
+
 
 
     def __call__(self, item):
