@@ -9,7 +9,7 @@ class GaussEGenerator(EGenerator):
 
 	def __init__(self, n_features=2, center_box= (-10.0, 10.0), cluster_std=0.5, std_low=0.2, std_high=1.5):
 		self.n_features = n_features
-		self.center_box = eval(center_box)
+		self.center_box = eval(str(center_box))
 		self.cluster_std = cluster_std
 		self.std_low = std_low
 		self.std_high = std_high
