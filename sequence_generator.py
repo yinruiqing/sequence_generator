@@ -36,11 +36,11 @@ class SGenerator(object):
         return res
 
     def sample_one(self, label_len, reorder=True, change_label=False):
-        random_seed = randint(0,1000)
-        num = self.ndistribution.sample(random_seed=random_seed)
-        weights = self.wdistribution.sample(num, random_seed=random_seed)
-        orders = self.odistribution.sample(label_len, weights, random_seed=random_seed)
-        durations = self.ddistribution.sample(label_len, random_seed=random_seed)
+        #print(random_seed)
+        num = self.ndistribution.sample()
+        weights = self.wdistribution.sample(num)
+        orders = self.odistribution.sample(label_len, weights)
+        durations = self.ddistribution.sample(label_len)
 
         labels = [[label] * dur for label, dur in zip(orders, durations)]
         labels = [label for sublist in labels for label in sublist]
@@ -50,7 +50,7 @@ class SGenerator(object):
             labels = self.re_order(labels)
 
         counter = [sum(labels==i) for i in range(1, num+1)]
-        embedding_cands = self.egenerator.generate_points(counter, random_seed=random_seed)
+        embedding_cands = self.egenerator.generate_points(counter)
         embeddings = np.zeros((len(labels), self.egenerator.n_features))
         for i, cand in enumerate(embedding_cands):
             embeddings[labels==(i+1)] = cand
@@ -58,6 +58,17 @@ class SGenerator(object):
         if change_label:
             labels = self.change_order(labels)
         return {'X':embeddings[:self.duration], 'y': labels[:self.duration]}
+
+
+    def sample_same_batch(self, label_len, batch_size, change_label=False):
+        Xs = []
+        ys = []
+        one = self.sample_one(label_len, change_label=change_label)
+        for i in range(batch_size):
+            Xs.append(one['X'])
+            ys.append(one['y'])
+
+        return {'X':np.array(Xs), 'y': np.array(ys)}
 
 
     def sample_batch(self, label_len, batch_size, change_label=False):

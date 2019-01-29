@@ -17,7 +17,6 @@ class UniformDistribution(WDistribution):
         super(UniformDistribution, self).__init__(self._NAME)
         
 
-    def sample(self, num, random_seed=None):
-        np.random.seed(random_seed)
+    def sample(self, num):
         weights = np.random.rand(num)
         return weights/weights.sum()

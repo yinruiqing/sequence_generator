@@ -17,6 +17,5 @@ class PoissonDistribution(DDistribution):
         super(PoissonDistribution, self).__init__(self._NAME)
         self.lam = lam
 
-    def sample(self, n=100, random_seed=None):
-        np.random.seed(random_seed)
+    def sample(self, n=100):
         return np.random.poisson(self.lam, n)

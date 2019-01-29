@@ -106,16 +106,18 @@ if __name__ == '__main__':
     max_spk = config['sequence_generator']['params']['max_spk']
     batch_size = config['sequence_generator']['params']['batch_size']
     num_per_epoch = config['sequence_generator']['params']['num_per_epoch']
+    fix_batch = config['sequence_generator']['params'].get('fix_batch', False)
+    single = config['sequence_generator']['params'].get('single', False)
 
     generator = ToyIterator(duration, num_distribution, weight_distribution, 
                     duration_distribution, order_distribution, embedding_generator, 
-                     max_spk = max_spk,num_per_epoch=num_per_epoch,
+                     max_spk = max_spk,num_per_epoch=num_per_epoch, fix_batch=fix_batch, single=single,
                     batch_size=batch_size, device='cuda')
 
 
     X_test, y_test = [], []
     itr = iter(generator)
-    for i in range(10):
+    for i in range(100):
         batch = next(itr)
         X_test.extend(batch.src.detach().cpu().numpy())
         y_test.extend(batch.tgt.max(-1)[1].detach().cpu().numpy())

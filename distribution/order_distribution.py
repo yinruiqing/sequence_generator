@@ -14,7 +14,7 @@ class MarkovDistribution(ODistribution):
     def __init__(self):
         super(MarkovDistribution, self).__init__(self._NAME)
        
-    def sample(self, num, occup_weights, random_seed=None):
+    def sample(self, num, occup_weights):
         def transmat_from_weights(occup_weights):
             length = len(occup_weights)
             weight_mat = np.tile(occup_weights, length).reshape(length,length)
@@ -24,7 +24,6 @@ class MarkovDistribution(ODistribution):
             return transmat
 
         from hmmlearn.hmm import MultinomialHMM
-        np.random.seed(random_seed)
         length = len(occup_weights)
         transmat = transmat_from_weights(occup_weights)
         model = MultinomialHMM(n_components=length)

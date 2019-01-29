@@ -19,6 +19,5 @@ class UniformDistribution(NDistribution):
         self.start = start
         self.stop = stop
 
-    def sample(self, random_seed=None):
-        np.random.seed(random_seed)
+    def sample(self):
         return randint(self.start, self.stop)
